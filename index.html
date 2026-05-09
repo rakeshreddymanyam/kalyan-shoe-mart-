@@ -1,395 +1,374 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  ShoppingBag, 
-  Plus, 
-  Trash2, 
-  Settings, 
-  Home, 
-  Package, 
-  X,
-  PlusCircle,
-  Store,
-  Lock,
-  LogIn,
-  LogOut,
-  CheckCircle2,
-  Star,
-  Zap
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pawan Kalyan Shoe Mart | Legendary 3D Collection</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-// --- Configuration ---
-const ADMIN_PASSWORD = "rakesh123";
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
-// --- 3D Shoe/Slipper Icon Components ---
-const Product3DAsset = ({ category, color = '#ef4444' }) => {
-  const isSlipper = category === 'Slippers';
-  return (
-    <div className="w-full h-full relative">
-      <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_20px_30px_rgba(0,0,0,0.5)] transition-transform duration-700 transform-gpu group-hover:scale-110">
-        <defs>
-          <linearGradient id="grad-shoe" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: color, stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#000', stopOpacity: 1 }} />
-          </linearGradient>
-        </defs>
-        {isSlipper ? (
-          <g>
-            <path d="M30 70 Q 50 85 70 70 L 75 30 Q 50 15 25 30 Z" fill="url(#grad-shoe)" />
-            <path d="M35 50 L 50 40 L 65 50" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" opacity="0.4" />
-          </g>
-        ) : (
-          <g>
-            <path d="M20 70 L 80 70 L 85 50 Q 80 30 50 35 L 25 40 Z" fill="url(#grad-shoe)" />
-            <path d="M20 70 L 80 70 L 80 75 L 20 75 Z" fill="#333" />
-            <path d="M30 45 L 45 42 M35 50 L 50 47" stroke="white" strokeWidth="2" opacity="0.3" />
-          </g>
-        )}
-      </svg>
-    </div>
-  );
-};
-
-// --- Sub-Components ---
-
-const Navbar = ({ view, setView, cartCount, onOpenCart }) => (
-  <nav className="fixed top-0 left-0 right-0 z-[100] px-3 py-4 md:px-8">
-    <div className="max-w-7xl mx-auto backdrop-blur-2xl bg-black/60 border border-white/10 rounded-[1.5rem] md:rounded-[2rem] px-4 md:px-6 py-3 flex justify-between items-center shadow-2xl">
-      <div className="flex items-center gap-2 md:gap-3">
-        <div className="bg-red-600 p-2 rounded-xl shadow-lg">
-          <Store className="text-white w-5 h-5 md:w-6 md:h-6" />
-        </div>
-        <h1 className="text-xs md:text-xl font-black tracking-tighter text-white uppercase italic leading-none">
-          PAWAN KALYAN <br className="md:hidden" /><span className="text-red-500">SHOE MART</span>
-        </h1>
-      </div>
-      <div className="flex items-center gap-2 md:gap-4">
-        <button onClick={() => setView('store')} className={`p-2 md:px-4 rounded-xl transition-all ${view === 'store' ? 'bg-white/10 text-red-500' : 'text-white/40'}`}>
-          <Home size={20} />
-        </button>
-        <button onClick={() => setView('admin')} className={`p-2 md:px-4 rounded-xl transition-all ${view === 'admin' ? 'bg-white/10 text-red-500' : 'text-white/40'}`}>
-          <Settings size={20} />
-        </button>
-        <button onClick={onOpenCart} className="relative p-2.5 bg-red-600 text-white rounded-xl shadow-xl active:scale-95 transition-transform">
-          <ShoppingBag size={20} />
-          {cartCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-white text-red-600 text-[10px] font-black px-1.5 py-0.5 rounded-full ring-1 ring-red-600">
-              {cartCount}
-            </span>
-          )}
-        </button>
-      </div>
-    </div>
-  </nav>
-);
-
-const StoreView = ({ products, onAddToCart }) => (
-  <div className="max-w-7xl mx-auto p-4 md:p-8 pt-28 md:pt-36 relative z-10">
-    <header className="mb-16 text-center px-4">
-      <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 backdrop-blur-md rounded-full border border-white/10 text-white/80 text-[10px] font-black uppercase tracking-widest mb-4">
-        <Zap size={14} className="text-red-500 fill-red-500" /> Legendary 3D Collection
-      </div>
-      <h2 className="text-4xl md:text-8xl font-black text-white mb-4 uppercase tracking-tighter italic leading-none">
-        Power <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400">Footwear</span>
-      </h2>
-      <p className="text-white/40 max-w-lg mx-auto font-medium text-sm md:text-lg">Exclusive styles designed for the modern leader.</p>
-    </header>
-
-    {products.length === 0 ? (
-      <div className="text-center py-20 bg-white/5 rounded-[2.5rem] border border-white/10 border-dashed">
-        <Package size={48} className="mx-auto text-white/10 mb-4" />
-        <p className="text-white/30 uppercase font-black text-xs">Inventory is Empty</p>
-      </div>
-    ) : (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        {products.map(product => (
-          <div key={product.id} className="group relative perspective-1000">
-            <div className="relative backdrop-blur-3xl bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-700 transform-gpu md:group-hover:rotate-x-12 md:group-hover:-rotate-y-12 md:group-hover:scale-[1.05] md:group-hover:-translate-y-4">
-              <div className="aspect-square relative flex items-center justify-center p-6 bg-gradient-to-b from-white/5 to-transparent">
-                <div className="w-full h-full flex items-center justify-center transform group-hover:translate-z-20 transition-transform duration-500">
-                  {product.image ? (
-                    <img src={product.image} className="w-full h-full object-contain drop-shadow-2xl" alt={product.name} />
-                  ) : (
-                    <div className="w-40 h-40">
-                      <Product3DAsset category={product.category} color={product.category === 'Slippers' ? '#3b82f6' : '#ef4444'} />
-                    </div>
-                  )}
-                </div>
-                <div className="absolute top-4 left-4 px-2 py-1 bg-black/60 rounded-lg text-[9px] font-black uppercase tracking-widest text-white/90 border border-white/10">
-                  {product.category}
-                </div>
-              </div>
-              <div className="p-6 md:p-8 pt-0">
-                <h3 className="text-lg font-black text-white mb-4 uppercase italic truncate group-hover:text-red-500 transition-colors">{product.name}</h3>
-                <div className="flex justify-between items-center">
-                  <span className="text-2xl font-black text-white">₹{product.price}</span>
-                  <button onClick={() => onAddToCart(product)} className="bg-white text-black hover:bg-red-600 hover:text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">Add To Bag</button>
-                </div>
-              </div>
-            </div>
-            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[70%] h-4 bg-black/40 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
-
-const AdminView = ({ products, orders, onAdd, onDelete, onLogout, newProduct, setNewProduct, onDeleteOrder }) => {
-  const [tab, setTab] = useState('inv');
-
-  return (
-    <div className="max-w-7xl mx-auto p-4 md:p-8 pt-28 md:pt-36 relative z-10">
-      <div className="backdrop-blur-3xl bg-white/5 rounded-[2rem] md:rounded-[3rem] border border-white/10 overflow-hidden shadow-2xl">
-        <div className="p-6 md:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-white/5 bg-white/5">
-          <div className="w-full md:w-auto">
-            <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter italic">Admin Dashboard</h2>
-            <div className="flex gap-4 mt-4 overflow-x-auto no-scrollbar">
-              <button onClick={() => setTab('inv')} className={`text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 transition-all ${tab === 'inv' ? 'border-red-500 text-white' : 'border-transparent text-white/30'}`}>Inventory</button>
-              <button onClick={() => setTab('ord')} className={`text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 transition-all ${tab === 'ord' ? 'border-red-500 text-white' : 'border-transparent text-white/40'}`}>Orders ({orders.length})</button>
-            </div>
-          </div>
-          <button onClick={onLogout} className="w-full md:w-auto bg-red-600 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest">Secure Logout</button>
-        </div>
-
-        <div className="p-6 md:p-10">
-          {tab === 'inv' ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-              <div className="lg:col-span-1">
-                <form onSubmit={onAdd} className="space-y-4">
-                  <input type="text" placeholder="Product Name" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white outline-none focus:ring-1 focus:ring-red-500" required />
-                  <input type="number" placeholder="Price (₹)" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white outline-none focus:ring-1 focus:ring-red-500" required />
-                  <select value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white outline-none">
-                    <option className="bg-black">Sneakers</option>
-                    <option className="bg-black">Slippers</option>
-                    <option className="bg-black">Formal</option>
-                  </select>
-                  <input type="text" placeholder="Image URL (Optional)" value={newProduct.image} onChange={e => setNewProduct({...newProduct, image: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white outline-none" />
-                  <button type="submit" className="w-full bg-red-600 text-white font-black py-4 rounded-xl uppercase text-xs tracking-widest">Add To Grid</button>
-                </form>
-              </div>
-              <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {products.map(item => (
-                  <div key={item.id} className="p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
-                        {item.image ? <img src={item.image} className="w-full h-full object-contain" /> : <Package size={20} className="text-white/10" />}
-                      </div>
-                      <div>
-                        <p className="text-white font-bold text-sm truncate max-w-[100px]">{item.name}</p>
-                        <p className="text-[10px] text-white/30 font-black">₹{item.price}</p>
-                      </div>
-                    </div>
-                    <button onClick={() => onDelete(item.id)} className="text-white/20 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {orders.length === 0 ? <div className="text-center py-10 opacity-20 uppercase font-black italic">No Bookings Yet</div> : 
-                orders.map(order => (
-                  <div key={order.id} className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        {/* Fixed: Displaying customerName, customerPhone from order object */}
-                        <p className="text-xl font-black text-white uppercase italic">{order.customerName}</p>
-                        <p className="text-red-500 text-xs font-bold">📞 {order.customerPhone}</p>
-                      </div>
-                      <button onClick={() => onDeleteOrder(order.id)} className="p-2 text-white/20 border border-white/10 rounded-lg hover:text-red-500"><Trash2 size={16} /></button>
-                    </div>
-                    {/* Fixed: Displaying customerAddress */}
-                    <div className="text-[10px] text-white/40 mb-4 bg-black/20 p-3 rounded-lg italic">📍 {order.customerAddress}</div>
-                    <div className="space-y-2">
-                      {order.items.map((it, idx) => (
-                        <div key={idx} className="flex justify-between text-xs font-bold text-white/60 uppercase">
-                          <span>{it.name} x{it.qty}</span>
-                          <span>₹{it.price * it.qty}</span>
-                        </div>
-                      ))}
-                      <div className="border-t border-white/10 pt-4 mt-2 flex justify-between font-black text-red-500 items-center">
-                        <span className="text-[10px] uppercase">Amount Received</span>
-                        <span className="text-2xl">₹{order.total}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              }
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const CartModal = ({ isOpen, onClose, cart, onRemove, total, onCheckout }) => {
-  const [checkout, setCheckout] = useState(false);
-  const [form, setForm] = useState({ customerName: '', customerPhone: '', customerAddress: '' });
-  const [success, setSuccess] = useState(false);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onCheckout(form);
-    setSuccess(true);
-    setTimeout(() => { setSuccess(false); setCheckout(false); onClose(); setForm({ customerName: '', customerPhone: '', customerAddress: '' }); }, 3000);
-  };
-
-  return (
-    <div className={`fixed inset-0 z-[200] flex justify-end transition-all duration-500 ${isOpen ? 'visible' : 'invisible'}`}>
-      <div className={`absolute inset-0 bg-black/90 backdrop-blur-md transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0'}`} onClick={onClose} />
-      <div className={`relative bg-black border-l border-white/10 w-full md:max-w-md h-full flex flex-col transition-transform transform ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="p-6 border-b border-white/5 flex justify-between items-center">
-          <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">{checkout ? 'Address' : 'My Bag'}</h3>
-          <button onClick={onClose} className="p-2 text-white/40"><X size={24} /></button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
-          {!checkout ? (
-            cart.length === 0 ? <p className="text-center text-white/10 font-black italic pt-20">EMPTY BAG</p> : 
-            cart.map(item => (
-              <div key={item.id} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-                <div className="w-16 h-16 bg-white/10 rounded-xl shrink-0 flex items-center justify-center overflow-hidden">
-                  {item.image ? <img src={item.image} className="w-full h-full object-cover" /> : <Package size={20} className="text-white/20" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-white truncate uppercase italic">{item.name}</h4>
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-[10px] text-white/40 font-black">Qty: {item.qty}</span>
-                    <span className="text-sm font-black text-white">₹{item.price}</span>
-                  </div>
-                </div>
-                <button onClick={() => onRemove(item.id)} className="text-white/20 ml-2"><Trash2 size={16} /></button>
-              </div>
-            ))
-          ) : (
-            <form id="checkout-form" onSubmit={handleSubmit} className="space-y-4">
-              <input type="text" required value={form.customerName} onChange={e => setForm({...form, customerName: e.target.value})} placeholder="Full Name" className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white outline-none focus:ring-1 focus:ring-red-500" />
-              <input type="tel" required value={form.customerPhone} onChange={e => setForm({...form, customerPhone: e.target.value})} placeholder="Mobile Number" className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white outline-none focus:ring-1 focus:ring-red-500" />
-              <textarea required value={form.customerAddress} onChange={e => setForm({...form, customerAddress: e.target.value})} placeholder="Full Address" rows="4" className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white outline-none focus:ring-1 focus:ring-red-500"></textarea>
-            </form>
-          )}
-        </div>
-
-        {cart.length > 0 && !success && (
-          <div className="p-6 bg-black/60 border-t border-white/5 backdrop-blur-xl">
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-white/30 font-black uppercase text-[10px]">Total Amount</span>
-              <span className="text-3xl font-black text-white">₹{total}</span>
-            </div>
-            {checkout ? (
-              <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => setCheckout(false)} className="bg-white/5 text-white py-4 rounded-xl font-black text-xs uppercase">Back</button>
-                <button type="submit" form="checkout-form" className="bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase shadow-xl">Confirm</button>
-              </div>
-            ) : (
-              <button onClick={() => setCheckout(true)} className="w-full bg-white text-black py-4 rounded-xl font-black text-sm uppercase">Checkout Now</button>
-            )}
-          </div>
-        )}
-
-        {success && (
-          <div className="absolute inset-0 bg-black/95 flex flex-col items-center justify-center p-10 text-center z-50">
-            <CheckCircle2 size={64} className="text-green-500 mb-4 animate-bounce" />
-            <h3 className="text-2xl font-black text-white uppercase italic mb-2">Order Confirmed</h3>
-            <p className="text-white/40 text-sm">Thank you for your purchase!</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// --- Main App Component ---
-
-const App = () => {
-  const [view, setView] = useState('store');
-  const [products, setProducts] = useState(() => JSON.parse(localStorage.getItem('shoemart_products_v3')) || []);
-  const [orders, setOrders] = useState(() => JSON.parse(localStorage.getItem('shoemart_orders_v3')) || []);
-  const [cart, setCart] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [newProduct, setNewProduct] = useState({ name: '', price: '', image: '', category: 'Sneakers' });
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-  const [adminPassInput, setAdminPassInput] = useState("");
-  const [authError, setAuthError] = useState("");
-
-  useEffect(() => localStorage.setItem('shoemart_products_v3', JSON.stringify(products)), [products]);
-  useEffect(() => localStorage.setItem('shoemart_orders_v3', JSON.stringify(orders)), [orders]);
-
-  const addProduct = (e) => {
-    e.preventDefault();
-    setProducts([...products, { ...newProduct, id: Date.now(), price: parseFloat(newProduct.price) }]);
-    setNewProduct({ name: '', price: '', image: '', category: 'Sneakers' });
-  };
-
-  const handleCheckout = (formData) => {
-    setOrders([{ ...formData, id: Date.now(), items: cart, total: cart.reduce((s,i)=>s+(i.price*i.qty),0), createdAt: Date.now() }, ...orders]);
-    setCart([]);
-  };
-
-  return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-red-500/30 overflow-x-hidden font-sans">
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-red-600/10 blur-[150px] animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/5 blur-[150px]"></div>
-      </div>
-
-      <Navbar view={view} setView={setView} cartCount={cart.reduce((s, i) => s + i.qty, 0)} onOpenCart={() => setIsCartOpen(true)} />
-      
-      <main className="relative z-10 pb-20">
-        {view === 'store' ? (
-          <StoreView products={products} onAddToCart={p => setCart(v => {
-            const ex = v.find(i => i.id === p.id);
-            return ex ? v.map(i => i.id === p.id ? {...i, qty: i.qty + 1} : i) : [...v, {...p, qty: 1}];
-          })} />
-        ) : (
-          !isAdminAuthenticated ? (
-            <div className="min-h-[80vh] flex items-center justify-center px-4">
-              <div className="backdrop-blur-3xl bg-white/5 p-8 md:p-12 rounded-[2.5rem] border border-white/10 w-full max-w-sm text-center">
-                <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center mx-auto mb-8 transform -rotate-12 shadow-2xl">
-                  <Lock size={32} />
-                </div>
-                <h2 className="text-3xl font-black text-white mb-6 uppercase tracking-tighter italic">Mart Admin</h2>
-                <form onSubmit={e => {
-                  e.preventDefault();
-                  if (adminPassInput === ADMIN_PASSWORD) setIsAdminAuthenticated(true);
-                  else { setAuthError("Wrong Pass."); setAdminPassInput(""); }
-                }} className="space-y-4">
-                  <input type="password" value={adminPassInput} onChange={e => setAdminPassInput(e.target.value)} placeholder="••••" className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-5 text-white text-center text-4xl tracking-[0.5em] outline-none" />
-                  <button type="submit" className="w-full bg-white text-black font-black py-4 rounded-xl uppercase text-xs tracking-widest shadow-xl">Unlock</button>
-                </form>
-              </div>
-            </div>
-          ) : (
-            <AdminView 
-              products={products} orders={orders} 
-              onAdd={addProduct}
-              onDelete={id => setProducts(products.filter(p => p.id !== id))}
-              onDeleteOrder={id => setOrders(orders.filter(o => o.id !== id))}
-              onLogout={() => { setIsAdminAuthenticated(false); setView('store'); }} 
-              newProduct={newProduct} setNewProduct={setNewProduct} 
-            />
-          )
-        )}
-      </main>
-
-      <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cart={cart} onRemove={id => setCart(c => c.filter(i => i.id !== id))} total={cart.reduce((s, i) => s + (i.price * i.qty), 0)} onCheckout={handleCheckout} />
-      
-      <footer className="py-10 text-center relative z-10 opacity-30 border-t border-white/5">
-        <p className="text-[10px] font-black uppercase tracking-[0.5em]">Pawan Kalyan Shoe Mart • Real-Time Local Mode</p>
-      </footer>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        .perspective-1000 { perspective: 1000px; }
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #050505; 
+            color: white; 
+            margin: 0; 
+            overflow-x: hidden; 
+        }
+        
+        /* 3D and UI Effects */
+        .perspective-1000 { perspective: 1200px; }
         .transform-gpu { transform-style: preserve-3d; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        .animate-float { animation: float 3s ease-in-out infinite; }
-      `}} />
-    </div>
-  );
-};
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        ::-webkit-scrollbar-thumb { background: #ef4444; border-radius: 10px; }
 
-export default App;
+        @keyframes float { 
+            0%, 100% { transform: translateY(0) rotate(0deg); } 
+            50% { transform: translateY(-12px) rotate(1deg); } 
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+
+        .blob { 
+            position: fixed; 
+            border-radius: 50%; 
+            filter: blur(120px); 
+            z-index: 0; 
+            pointer-events: none; 
+            opacity: 0.15; 
+        }
+
+        /* Mobile specific spacing */
+        @media (max-width: 768px) {
+            .mobile-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- Background Decoration -->
+    <div class="blob bg-red-600 w-[500px] h-[500px] top-[-10%] left-[-10%] animate-pulse"></div>
+    <div class="blob bg-blue-900 w-[400px] h-[400px] bottom-[-10%] right-[-10%]"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const ADMIN_PASSWORD = "rakesh123";
+
+        // --- 3D Icon Component ---
+        const ProductIcon = ({ category }) => {
+            const color = category === 'Slippers' ? '#3b82f6' : '#ef4444';
+            return (
+                <div className="w-full h-full p-6 animate-float">
+                    <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-2xl">
+                        <defs>
+                            <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor={color} />
+                                <stop offset="100%" stopColor="#000" />
+                            </linearGradient>
+                        </defs>
+                        {category === 'Slippers' ? (
+                            <path d="M30 70 Q 50 85 70 70 L 75 30 Q 50 15 25 30 Z" fill="url(#g)" />
+                        ) : (
+                            <g>
+                                <path d="M20 70 L 80 70 L 85 50 Q 80 30 50 35 L 25 40 Z" fill="url(#g)" />
+                                <path d="M20 70 L 80 70 L 80 75 L 20 75 Z" fill="#333" />
+                            </g>
+                        )}
+                    </svg>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [view, setView] = useState('store');
+            const [products, setProducts] = useState(() => JSON.parse(localStorage.getItem('pk_data_shoes')) || []);
+            const [orders, setOrders] = useState(() => JSON.parse(localStorage.getItem('pk_data_orders')) || []);
+            const [cart, setCart] = useState([]);
+            const [isCartOpen, setIsCartOpen] = useState(false);
+            const [isAdminMode, setIsAdminMode] = useState(false);
+            const [passInput, setPassInput] = useState("");
+            const [newProduct, setNewProduct] = useState({ name: '', price: '', image: '', category: 'Sneakers' });
+
+            useEffect(() => { localStorage.setItem('pk_data_shoes', JSON.stringify(products)); }, [products]);
+            useEffect(() => { localStorage.setItem('pk_data_orders', JSON.stringify(orders)); }, [orders]);
+            useEffect(() => { if (window.lucide) lucide.createIcons(); });
+
+            const addToCart = (p) => {
+                const exist = cart.find(x => x.id === p.id);
+                if (exist) setCart(cart.map(x => x.id === p.id ? {...x, qty: x.qty + 1} : x));
+                else setCart([...cart, {...p, qty: 1}]);
+            };
+
+            const handleFinalBooking = (customerInfo) => {
+                const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+                const orderData = {
+                    ...customerInfo,
+                    id: Date.now(),
+                    items: [...cart],
+                    total,
+                    time: new Date().toLocaleString()
+                };
+                setOrders([orderData, ...orders]);
+                setCart([]);
+            };
+
+            return (
+                <div className="min-h-screen relative z-10 flex flex-col">
+                    {/* Header Navbar */}
+                    <nav className="fixed top-0 left-0 right-0 z-[100] p-4 md:p-6">
+                        <div className="max-w-7xl mx-auto backdrop-blur-2xl bg-black/60 border border-white/10 rounded-2xl md:rounded-full px-6 py-3 flex justify-between items-center shadow-2xl">
+                            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView('store')}>
+                                <div className="bg-red-600 p-2 rounded-lg shadow-lg shadow-red-600/20"><i data-lucide="store" className="text-white w-5 h-5"></i></div>
+                                <h1 className="text-sm md:text-xl font-black uppercase italic tracking-tighter">PAWAN KALYAN <span className="text-red-500">MART</span></h1>
+                            </div>
+                            <div className="flex items-center gap-3 md:gap-8">
+                                <button onClick={() => setView('store')} className={`font-black uppercase text-[10px] tracking-widest transition-colors ${view === 'store' ? 'text-red-500' : 'text-white/40 hover:text-white'}`}>Store</button>
+                                <button onClick={() => setView('admin')} className={`font-black uppercase text-[10px] tracking-widest transition-colors ${view === 'admin' ? 'text-red-500' : 'text-white/40'}`}>Admin</button>
+                                <button onClick={() => setIsCartOpen(true)} className="bg-red-600 p-2 px-4 rounded-full flex items-center gap-2 relative transform active:scale-90 transition-all">
+                                    <i data-lucide="shopping-bag" className="w-4 h-4"></i>
+                                    {cart.length > 0 && <span className="absolute -top-1 -right-1 bg-white text-red-600 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-red-600">{cart.reduce((s,i)=>s+i.qty,0)}</span>}
+                                </button>
+                            </div>
+                        </div>
+                    </nav>
+
+                    <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto w-full flex-grow">
+                        {view === 'store' ? (
+                            <div className="animate-in fade-in duration-1000">
+                                <div className="text-center mb-16">
+                                    <h2 className="text-5xl md:text-8xl font-black italic tracking-tighter uppercase leading-none text-white">POWER <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-500">STEP</span></h2>
+                                    <p className="text-white/20 uppercase tracking-[0.4em] text-[10px] mt-4 font-black">Walk like a legend • 3D Exclusive</p>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                                    {products.map(p => (
+                                        <div key={p.id} className="group perspective-1000">
+                                            <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-6 transition-all duration-700 transform-gpu group-hover:rotate-x-12 group-hover:-translate-y-4 group-hover:bg-white/10 shadow-2xl relative overflow-hidden">
+                                                <div className="aspect-square bg-black/40 rounded-3xl mb-6 flex items-center justify-center overflow-hidden border border-white/5">
+                                                    {p.image ? <img src={p.image} className="w-full h-full object-contain p-4 drop-shadow-2xl" /> : <ProductIcon category={p.category} />}
+                                                </div>
+                                                <h3 className="font-black text-xl uppercase italic truncate mb-2 text-white">{p.name}</h3>
+                                                <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-6">{p.category}</p>
+                                                <div className="flex justify-between items-center border-t border-white/5 pt-4">
+                                                    <span className="text-2xl font-black italic text-red-500">₹{p.price}</span>
+                                                    <button onClick={() => addToCart(p)} className="bg-white text-black p-3 px-6 rounded-2xl font-black text-[10px] uppercase hover:bg-red-600 hover:text-white transition-all shadow-lg">Add</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            !isAdminMode ? (
+                                <div className="max-w-sm mx-auto bg-white/5 p-10 rounded-[3rem] border border-white/10 text-center backdrop-blur-3xl shadow-2xl animate-in zoom-in duration-300 mt-10">
+                                    <i data-lucide="lock" className="w-12 h-12 mx-auto mb-6 text-red-500"></i>
+                                    <h2 className="text-2xl font-black uppercase mb-6 tracking-tighter">Admin Login</h2>
+                                    <input type="password" value={passInput} onChange={e => setPassInput(e.target.value)} placeholder="••••" className="w-full bg-black/40 border border-white/10 p-5 rounded-2xl text-center text-3xl tracking-[0.5em] outline-none mb-6 focus:border-red-500 transition-all text-white" />
+                                    <button onClick={() => { if(passInput === ADMIN_PASSWORD) setIsAdminMode(true); else alert('Incorrect Password'); }} className="w-full bg-red-600 p-4 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-red-600/20">Unlock</button>
+                                </div>
+                            ) : (
+                                <div className="space-y-12 animate-in slide-in-from-bottom duration-500">
+                                    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                                        <h2 className="text-4xl font-black uppercase italic tracking-tighter text-white">MART <span className="text-red-500">ADMIN</span></h2>
+                                        <button onClick={() => setIsAdminMode(false)} className="bg-white/5 border border-white/10 p-2 px-8 rounded-full font-black uppercase text-[10px] hover:bg-red-600 transition-colors">Logout</button>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                                        <div className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem] shadow-xl h-fit">
+                                            <h3 className="font-black uppercase mb-6 italic text-red-500 flex items-center gap-2"><i data-lucide="plus-circle" className="w-4 h-4"></i> Add Shoe</h3>
+                                            <div className="space-y-4">
+                                                <input placeholder="Name" value={newProduct.name} onChange={e=>setNewProduct({...newProduct, name: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none focus:border-red-500 text-white" />
+                                                <input placeholder="Price ₹" type="number" value={newProduct.price} onChange={e=>setNewProduct({...newProduct, price: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none text-white" />
+                                                <select value={newProduct.category} onChange={e=>setNewProduct({...newProduct, category: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none text-white/50 uppercase font-black">
+                                                    <option value="Sneakers">Sneakers</option>
+                                                    <option value="Slippers">Slippers</option>
+                                                    <option value="Formal">Formal</option>
+                                                </select>
+                                                <input placeholder="Image URL (optional)" value={newProduct.image} onChange={e=>setNewProduct({...newProduct, image: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none text-white" />
+                                                <button onClick={() => { setProducts([...products, {...newProduct, id: Date.now()}]); setNewProduct({name:'', price:'', image:'', category:'Sneakers'}); }} className="w-full bg-red-600 p-4 rounded-xl font-black uppercase text-xs shadow-lg shadow-red-600/20">Save to Store</button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="lg:col-span-2 space-y-4">
+                                            <h3 className="font-black uppercase mb-6 italic text-white/40">Inventory ({products.length})</h3>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                {products.map(p => (
+                                                    <div key={p.id} className="p-4 bg-white/5 border border-white/10 rounded-2xl flex justify-between items-center hover:bg-white/10 transition-all">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="w-12 h-12 bg-black rounded-xl p-1 overflow-hidden border border-white/5 flex items-center justify-center shrink-0">
+                                                                {p.image ? <img src={p.image} className="w-full h-full object-contain"/> : <i data-lucide="package" className="w-5 h-5 text-white/20"></i>}
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-black text-sm uppercase italic text-white truncate w-32">{p.name}</p>
+                                                                <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">₹{p.price} • {p.category}</p>
+                                                            </div>
+                                                        </div>
+                                                        <button onClick={() => setProducts(products.filter(x=>x.id!==p.id))} className="text-white/20 hover:text-red-500 p-2 transition-all"><i data-lucide="trash-2" className="w-5 h-5"></i></button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white/5 border border-white/10 p-8 rounded-[3rem] shadow-2xl">
+                                        <h3 className="font-black uppercase mb-8 italic text-2xl text-red-500">Customer Bookings</h3>
+                                        <div className="space-y-6">
+                                            {orders.length === 0 ? <p className="text-center text-white/10 uppercase font-black py-20 tracking-[0.5em]">No orders received yet</p> : 
+                                                orders.map(o => (
+                                                    <div key={o.id} className="bg-black/60 border border-white/5 p-8 rounded-[2rem] grid grid-cols-1 md:grid-cols-3 gap-8 hover:border-red-500/30 transition-all">
+                                                        <div className="md:border-r border-white/5 pr-4">
+                                                            <div className="inline-block px-3 py-1 bg-red-600/10 text-red-500 text-[10px] font-black uppercase rounded-full mb-4">Customer Details</div>
+                                                            <p className="text-2xl font-black uppercase italic mb-1 text-white">{o.name}</p>
+                                                            <p className="text-red-500 font-black text-sm">📞 {o.phone}</p>
+                                                            <div className="text-white/40 text-xs mt-4 bg-white/5 p-4 rounded-2xl italic leading-relaxed border border-white/5">
+                                                                <p className="text-[8px] font-black text-white/20 uppercase mb-2">Address</p>
+                                                                📍 {o.address}
+                                                            </div>
+                                                        </div>
+                                                        <div className="md:col-span-2 flex flex-col justify-between">
+                                                            <div>
+                                                                <p className="text-[10px] font-black text-white/20 uppercase mb-4 tracking-widest">Order List</p>
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                                    {o.items.map((it, idx) => (
+                                                                        <div key={idx} className="bg-white/5 p-3 px-5 rounded-2xl flex justify-between items-center border border-white/5">
+                                                                            <span className="text-xs font-black uppercase italic text-white/80">{it.name} <span className="text-red-500 ml-2">x{it.qty}</span></span>
+                                                                            <span className="text-sm font-black text-white">₹{it.price*it.qty}</span>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                            <div className="mt-8 flex flex-col md:flex-row justify-between items-center border-t border-white/5 pt-6 gap-4">
+                                                                <p className="text-[9px] font-black text-white/20 uppercase tracking-widest order-2 md:order-1">{o.time}</p>
+                                                                <div className="flex items-center gap-6 order-1 md:order-2">
+                                                                    <div className="text-right">
+                                                                        <p className="text-[8px] font-black text-white/20 uppercase">Total Received</p>
+                                                                        <p className="text-3xl font-black text-red-500 italic leading-none">₹{o.total}</p>
+                                                                    </div>
+                                                                    <button onClick={() => setOrders(orders.filter(x=>x.id!==o.id))} className="bg-white/5 p-3 rounded-xl text-white/20 hover:text-red-500 hover:bg-red-500/10 transition-all border border-white/5"><i data-lucide="trash-2" className="w-5 h-5"></i></button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        )}
+                    </main>
+
+                    {/* Cart Drawer Modal */}
+                    {isCartOpen && <CartDrawer cart={cart} onClose={() => setIsCartOpen(false)} onRemove={id => setCart(cart.filter(x=>x.id!==id))} onCheckout={handleFinalBooking} />}
+
+                    <footer className="py-16 text-center border-t border-white/5 opacity-30 mt-auto">
+                        <p className="text-[9px] font-black uppercase tracking-[0.8em]">Pawan Kalyan Shoe Mart • Authentic Collection</p>
+                    </footer>
+                </div>
+            );
+        };
+
+        const CartDrawer = ({ cart, onClose, onRemove, onCheckout }) => {
+            const [step, setStep] = useState(1);
+            const [form, setForm] = useState({ name: '', phone: '', address: '' });
+            const [success, setSuccess] = useState(false);
+            const total = cart.reduce((s,i)=>s+(i.price*i.qty),0);
+
+            const handleOrderSubmit = () => {
+                if(!form.name || !form.phone || !form.address) return alert("Please fill all details");
+                onCheckout(form);
+                setSuccess(true);
+                setTimeout(() => onClose(), 3500);
+            };
+
+            return (
+                <div className="fixed inset-0 z-[200] flex justify-end">
+                    <div className="absolute inset-0 bg-black/95 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
+                    <div className="relative bg-[#0a0a0a] border-l border-white/10 w-full md:max-w-md h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-500">
+                        <div className="p-8 border-b border-white/5 flex justify-between items-center bg-black/40 backdrop-blur-md">
+                            <h3 className="text-3xl font-black uppercase italic tracking-tighter text-white">{step === 1 ? 'My Bag' : 'Booking Info'}</h3>
+                            <button onClick={onClose} className="p-2 text-white/40 hover:text-white transition-colors"><i data-lucide="x"></i></button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-8 space-y-4 no-scrollbar">
+                            {!success ? (
+                                step === 1 ? (
+                                    cart.length === 0 ? (
+                                        <div className="text-center py-20 opacity-20">
+                                            <i data-lucide="shopping-bag" className="w-16 h-16 mx-auto mb-4"></i>
+                                            <p className="font-black uppercase italic text-sm">Bag is empty</p>
+                                        </div>
+                                    ) : cart.map(i => (
+                                        <div key={i.id} className="bg-white/5 p-4 rounded-[2rem] flex gap-5 items-center border border-white/5 hover:bg-white/10 transition-all">
+                                            <div className="w-20 h-20 bg-black rounded-2xl flex items-center justify-center p-2 border border-white/5 shrink-0">
+                                                {i.image ? <img src={i.image} className="w-full h-full object-contain drop-shadow-xl"/> : <ProductIcon category={i.category}/>}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-black uppercase italic text-sm text-white truncate">{i.name}</p>
+                                                <p className="text-[10px] text-white/40 font-bold uppercase mt-1">₹{i.price} <span className="text-red-500 ml-2">Qty: {i.qty}</span></p>
+                                            </div>
+                                            <button onClick={()=>onRemove(i.id)} className="text-white/20 hover:text-red-500 p-2"><i data-lucide="trash-2" className="w-4 h-4"></i></button>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="space-y-5 animate-in fade-in duration-500">
+                                        <div className="bg-red-600/5 p-6 rounded-[2rem] border border-red-600/20 mb-8">
+                                            <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-2">Booking Summary</p>
+                                            <p className="text-white font-bold text-sm">Total Amount: <span className="text-xl font-black ml-2 text-white">₹{total}</span></p>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <label className="text-[10px] font-black text-white/40 uppercase ml-2">Your Full Name</label>
+                                            <input value={form.name} onChange={e=>setForm({...form, name: e.target.value})} placeholder="e.g. Rahul Sharma" className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none focus:border-red-500 transition-all text-sm" />
+                                            <label className="text-[10px] font-black text-white/40 uppercase ml-2">Phone Number</label>
+                                            <input type="tel" value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} placeholder="Mobile Number" className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none focus:border-red-500 transition-all text-sm" />
+                                            <label className="text-[10px] font-black text-white/40 uppercase ml-2">Delivery Address</label>
+                                            <textarea value={form.address} onChange={e=>setForm({...form, address: e.target.value})} placeholder="Full address with landmark" rows="4" className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none focus:border-red-500 transition-all text-sm"></textarea>
+                                        </div>
+                                    </div>
+                                )
+                            ) : (
+                                <div className="h-full flex flex-col items-center justify-center text-center animate-in zoom-in duration-500">
+                                    <div className="w-24 h-24 bg-green-500/10 rounded-full flex items-center justify-center mb-8 border border-green-500/20 shadow-2xl shadow-green-500/10">
+                                        <i data-lucide="check-circle-2" className="w-12 h-12 text-green-500 animate-bounce"></i>
+                                    </div>
+                                    <h4 className="text-4xl font-black uppercase italic text-white tracking-tighter mb-4 leading-none">ORDER<br/>SUCCESSFUL</h4>
+                                    <p className="text-white/40 uppercase text-[10px] tracking-[0.4em] font-black">We will contact you shortly</p>
+                                </div>
+                            )}
+                        </div>
+                        {cart.length > 0 && !success && (
+                            <div className="p-8 bg-black/60 border-t border-white/5 backdrop-blur-3xl shadow-2xl">
+                                <div className="flex justify-between items-center mb-8 uppercase italic font-black">
+                                    <span className="text-white/20 text-[10px] tracking-widest">Payable Amount</span>
+                                    <span className="text-3xl text-red-500 leading-none">₹{total}</span>
+                                </div>
+                                {step === 1 ? (
+                                    <button onClick={()=>setStep(2)} className="w-full bg-white text-black p-5 rounded-[1.5rem] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-xl shadow-white/5">Confirm Items</button>
+                                ) : (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <button onClick={()=>setStep(1)} className="bg-white/5 border border-white/10 p-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest text-white/60 hover:bg-white/10">Back</button>
+                                        <button onClick={handleOrderSubmit} className="bg-red-600 p-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest text-white shadow-xl shadow-red-600/20 active:scale-95 transition-all">Book Now</button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // Render the App
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
