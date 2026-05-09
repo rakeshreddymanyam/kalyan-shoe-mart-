@@ -3,61 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pawan Kalyan Shoe Mart | Legendary 3D Collection</title>
+    <title>Pawan Kalyan Shoe Mart | Admin Fixed</title>
     
-    <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #050505; 
-            color: white; 
-            margin: 0; 
-            overflow-x: hidden; 
-        }
-        
-        /* 3D and UI Effects */
-        .perspective-1000 { perspective: 1200px; }
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; margin: 0; overflow-x: hidden; }
+        .perspective-1000 { perspective: 1000px; }
         .transform-gpu { transform-style: preserve-3d; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
         ::-webkit-scrollbar-thumb { background: #ef4444; border-radius: 10px; }
-
-        @keyframes float { 
-            0%, 100% { transform: translateY(0) rotate(0deg); } 
-            50% { transform: translateY(-12px) rotate(1deg); } 
-        }
-        .animate-float { animation: float 4s ease-in-out infinite; }
-
-        .blob { 
-            position: fixed; 
-            border-radius: 50%; 
-            filter: blur(120px); 
-            z-index: 0; 
-            pointer-events: none; 
-            opacity: 0.15; 
-        }
-
-        /* Mobile specific spacing */
-        @media (max-width: 768px) {
-            .mobile-grid { grid-template-columns: 1fr; }
-        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .blob { position: fixed; border-radius: 50%; filter: blur(120px); z-index: 0; pointer-events: none; opacity: 0.15; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
-    <!-- Background Decoration -->
     <div class="blob bg-red-600 w-[500px] h-[500px] top-[-10%] left-[-10%] animate-pulse"></div>
     <div class="blob bg-blue-900 w-[400px] h-[400px] bottom-[-10%] right-[-10%]"></div>
 
@@ -65,25 +36,16 @@
         const { useState, useEffect } = React;
         const ADMIN_PASSWORD = "rakesh123";
 
-        // --- 3D Icon Component ---
         const ProductIcon = ({ category }) => {
             const color = category === 'Slippers' ? '#3b82f6' : '#ef4444';
             return (
                 <div className="w-full h-full p-6 animate-float">
                     <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-2xl">
-                        <defs>
-                            <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor={color} />
-                                <stop offset="100%" stopColor="#000" />
-                            </linearGradient>
-                        </defs>
+                        <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor={color} /><stop offset="100%" stopColor="#000" /></linearGradient></defs>
                         {category === 'Slippers' ? (
                             <path d="M30 70 Q 50 85 70 70 L 75 30 Q 50 15 25 30 Z" fill="url(#g)" />
                         ) : (
-                            <g>
-                                <path d="M20 70 L 80 70 L 85 50 Q 80 30 50 35 L 25 40 Z" fill="url(#g)" />
-                                <path d="M20 70 L 80 70 L 80 75 L 20 75 Z" fill="#333" />
-                            </g>
+                            <g><path d="M20 70 L 80 70 L 85 50 Q 80 30 50 35 L 25 40 Z" fill="url(#g)" /><path d="M20 70 L 80 70 L 80 75 L 20 75 Z" fill="#333" /></g>
                         )}
                     </svg>
                 </div>
@@ -92,76 +54,76 @@
 
         const App = () => {
             const [view, setView] = useState('store');
-            const [products, setProducts] = useState(() => JSON.parse(localStorage.getItem('pk_data_shoes')) || []);
-            const [orders, setOrders] = useState(() => JSON.parse(localStorage.getItem('pk_data_orders')) || []);
+            const [products, setProducts] = useState(() => JSON.parse(localStorage.getItem('pk_v6_prod')) || []);
+            const [orders, setOrders] = useState(() => JSON.parse(localStorage.getItem('pk_v6_ord')) || []);
             const [cart, setCart] = useState([]);
             const [isCartOpen, setIsCartOpen] = useState(false);
-            const [isAdminMode, setIsAdminMode] = useState(false);
+            const [isAdminAuth, setIsAdminAuth] = useState(false);
             const [passInput, setPassInput] = useState("");
             const [newProduct, setNewProduct] = useState({ name: '', price: '', image: '', category: 'Sneakers' });
 
-            useEffect(() => { localStorage.setItem('pk_data_shoes', JSON.stringify(products)); }, [products]);
-            useEffect(() => { localStorage.setItem('pk_data_orders', JSON.stringify(orders)); }, [orders]);
+            useEffect(() => { localStorage.setItem('pk_v6_prod', JSON.stringify(products)); }, [products]);
+            useEffect(() => { localStorage.setItem('pk_v6_ord', JSON.stringify(orders)); }, [orders]);
             useEffect(() => { if (window.lucide) lucide.createIcons(); });
 
-            const addToCart = (p) => {
-                const exist = cart.find(x => x.id === p.id);
-                if (exist) setCart(cart.map(x => x.id === p.id ? {...x, qty: x.qty + 1} : x));
-                else setCart([...cart, {...p, qty: 1}]);
-            };
-
-            const handleFinalBooking = (customerInfo) => {
+            const handleCheckout = (formData) => {
                 const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-                const orderData = {
-                    ...customerInfo,
-                    id: Date.now(),
-                    items: [...cart],
-                    total,
-                    time: new Date().toLocaleString()
-                };
-                setOrders([orderData, ...orders]);
+                const newOrder = { ...formData, id: Date.now(), items: [...cart], total, time: new Date().toLocaleString() };
+                setOrders([newOrder, ...orders]);
                 setCart([]);
             };
 
+            const addProduct = () => {
+                if(!newProduct.name || !newProduct.price) return alert("Fill Name and Price");
+                setProducts([...products, { ...newProduct, id: Date.now(), price: parseFloat(newProduct.price) }]);
+                setNewProduct({ name: '', price: '', image: '', category: 'Sneakers' });
+            };
+
+            const deleteProduct = (id) => setProducts(products.filter(p => p.id !== id));
+            const deleteOrder = (id) => setOrders(orders.filter(o => o.id !== id));
+
             return (
-                <div className="min-h-screen relative z-10 flex flex-col">
-                    {/* Header Navbar */}
+                <div className="min-h-screen relative z-10">
                     <nav className="fixed top-0 left-0 right-0 z-[100] p-4 md:p-6">
-                        <div className="max-w-7xl mx-auto backdrop-blur-2xl bg-black/60 border border-white/10 rounded-2xl md:rounded-full px-6 py-3 flex justify-between items-center shadow-2xl">
+                        <div className="max-w-7xl mx-auto backdrop-blur-xl bg-black/60 border border-white/10 rounded-2xl md:rounded-full px-6 py-3 flex justify-between items-center shadow-2xl">
                             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView('store')}>
-                                <div className="bg-red-600 p-2 rounded-lg shadow-lg shadow-red-600/20"><i data-lucide="store" className="text-white w-5 h-5"></i></div>
-                                <h1 className="text-sm md:text-xl font-black uppercase italic tracking-tighter">PAWAN KALYAN <span className="text-red-500">MART</span></h1>
+                                <div className="bg-red-600 p-2 rounded-lg shadow-lg"><i data-lucide="store" className="text-white w-5 h-5"></i></div>
+                                <h1 className="text-sm md:text-xl font-black uppercase italic tracking-tighter text-white">PAWAN KALYAN <span className="text-red-500">MART</span></h1>
                             </div>
-                            <div className="flex items-center gap-3 md:gap-8">
-                                <button onClick={() => setView('store')} className={`font-black uppercase text-[10px] tracking-widest transition-colors ${view === 'store' ? 'text-red-500' : 'text-white/40 hover:text-white'}`}>Store</button>
-                                <button onClick={() => setView('admin')} className={`font-black uppercase text-[10px] tracking-widest transition-colors ${view === 'admin' ? 'text-red-500' : 'text-white/40'}`}>Admin</button>
-                                <button onClick={() => setIsCartOpen(true)} className="bg-red-600 p-2 px-4 rounded-full flex items-center gap-2 relative transform active:scale-90 transition-all">
+                            <div className="flex items-center gap-4">
+                                <button onClick={() => setView('store')} className={`text-[10px] font-black uppercase tracking-widest ${view === 'store' ? 'text-red-500' : 'text-white/40'}`}>Store</button>
+                                <button onClick={() => setView('admin')} className={`text-[10px] font-black uppercase tracking-widest ${view === 'admin' ? 'text-red-500' : 'text-white/40'}`}>Admin</button>
+                                <button onClick={() => setIsCartOpen(true)} className="bg-red-600 p-2 px-4 rounded-full relative">
                                     <i data-lucide="shopping-bag" className="w-4 h-4"></i>
-                                    {cart.length > 0 && <span className="absolute -top-1 -right-1 bg-white text-red-600 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-red-600">{cart.reduce((s,i)=>s+i.qty,0)}</span>}
+                                    {cart.length > 0 && <span className="absolute -top-1 -right-1 bg-white text-red-600 text-[10px] font-black w-4 h-4 flex items-center justify-center rounded-full">{cart.reduce((s,i)=>s+i.qty,0)}</span>}
                                 </button>
                             </div>
                         </div>
                     </nav>
 
-                    <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto w-full flex-grow">
+                    <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
                         {view === 'store' ? (
-                            <div className="animate-in fade-in duration-1000">
+                            <div>
                                 <div className="text-center mb-16">
-                                    <h2 className="text-5xl md:text-8xl font-black italic tracking-tighter uppercase leading-none text-white">POWER <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-500">STEP</span></h2>
-                                    <p className="text-white/20 uppercase tracking-[0.4em] text-[10px] mt-4 font-black">Walk like a legend • 3D Exclusive</p>
+                                    <h2 className="text-5xl md:text-8xl font-black italic tracking-tighter uppercase leading-none">POWER <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-500">STEP</span></h2>
+                                    <p className="text-white/30 uppercase tracking-[0.3em] text-xs mt-4">Exclusive 3D Collection</p>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                                     {products.map(p => (
                                         <div key={p.id} className="group perspective-1000">
-                                            <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-6 transition-all duration-700 transform-gpu group-hover:rotate-x-12 group-hover:-translate-y-4 group-hover:bg-white/10 shadow-2xl relative overflow-hidden">
-                                                <div className="aspect-square bg-black/40 rounded-3xl mb-6 flex items-center justify-center overflow-hidden border border-white/5">
-                                                    {p.image ? <img src={p.image} className="w-full h-full object-contain p-4 drop-shadow-2xl" /> : <ProductIcon category={p.category} />}
+                                            <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-6 transition-all duration-700 transform-gpu group-hover:rotate-x-12 group-hover:-translate-y-4 shadow-2xl relative">
+                                                <div className="aspect-square bg-black/40 rounded-2xl mb-6 flex items-center justify-center overflow-hidden">
+                                                    {p.image ? <img src={p.image} className="w-full h-full object-contain p-4" /> : <ProductIcon category={p.category} />}
                                                 </div>
-                                                <h3 className="font-black text-xl uppercase italic truncate mb-2 text-white">{p.name}</h3>
-                                                <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-6">{p.category}</p>
+                                                <h3 className="font-black text-xl uppercase italic truncate mb-2">{p.name}</h3>
                                                 <div className="flex justify-between items-center border-t border-white/5 pt-4">
                                                     <span className="text-2xl font-black italic text-red-500">₹{p.price}</span>
-                                                    <button onClick={() => addToCart(p)} className="bg-white text-black p-3 px-6 rounded-2xl font-black text-[10px] uppercase hover:bg-red-600 hover:text-white transition-all shadow-lg">Add</button>
+                                                    <button onClick={() => {
+                                                        const ex = cart.find(x => x.id === p.id);
+                                                        if (exist) setCart(cart.map(x => x.id === p.id ? {...x, qty: x.qty + 1} : x));
+                                                        else setCart([...cart, {...p, qty: 1}]);
+                                                        setIsCartOpen(true);
+                                                    }} className="bg-white text-black p-3 px-6 rounded-xl font-black text-[10px] uppercase hover:bg-red-600 hover:text-white transition-all">Add</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -169,92 +131,73 @@
                                 </div>
                             </div>
                         ) : (
-                            !isAdminMode ? (
-                                <div className="max-w-sm mx-auto bg-white/5 p-10 rounded-[3rem] border border-white/10 text-center backdrop-blur-3xl shadow-2xl animate-in zoom-in duration-300 mt-10">
-                                    <i data-lucide="lock" className="w-12 h-12 mx-auto mb-6 text-red-500"></i>
-                                    <h2 className="text-2xl font-black uppercase mb-6 tracking-tighter">Admin Login</h2>
-                                    <input type="password" value={passInput} onChange={e => setPassInput(e.target.value)} placeholder="••••" className="w-full bg-black/40 border border-white/10 p-5 rounded-2xl text-center text-3xl tracking-[0.5em] outline-none mb-6 focus:border-red-500 transition-all text-white" />
-                                    <button onClick={() => { if(passInput === ADMIN_PASSWORD) setIsAdminMode(true); else alert('Incorrect Password'); }} className="w-full bg-red-600 p-4 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-red-600/20">Unlock</button>
+                            !isAdminAuth ? (
+                                <div className="max-w-sm mx-auto bg-white/5 p-10 rounded-[3rem] border border-white/10 text-center">
+                                    <h2 className="text-2xl font-black uppercase mb-6">Admin Access</h2>
+                                    <input type="password" value={passInput} onChange={e => setPassInput(e.target.value)} placeholder="••••" className="w-full bg-black/40 border border-white/10 p-5 rounded-2xl text-center text-3xl outline-none mb-6 focus:border-red-500" />
+                                    <button onClick={() => { if(passInput === ADMIN_PASSWORD) setIsAdminAuth(true); else alert('Denied'); }} className="w-full bg-red-600 p-4 rounded-xl font-black uppercase text-xs">Unlock</button>
                                 </div>
                             ) : (
-                                <div className="space-y-12 animate-in slide-in-from-bottom duration-500">
-                                    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                                        <h2 className="text-4xl font-black uppercase italic tracking-tighter text-white">MART <span className="text-red-500">ADMIN</span></h2>
-                                        <button onClick={() => setIsAdminMode(false)} className="bg-white/5 border border-white/10 p-2 px-8 rounded-full font-black uppercase text-[10px] hover:bg-red-600 transition-colors">Logout</button>
+                                <div className="space-y-10">
+                                    <div className="flex justify-between items-center">
+                                        <h2 className="text-3xl font-black uppercase italic tracking-tighter">Admin Panel</h2>
+                                        <button onClick={() => setIsAdminAuth(false)} className="bg-white/5 p-2 px-6 rounded-full font-black uppercase text-[10px]">Logout</button>
                                     </div>
-                                    
                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                                        <div className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem] shadow-xl h-fit">
-                                            <h3 className="font-black uppercase mb-6 italic text-red-500 flex items-center gap-2"><i data-lucide="plus-circle" className="w-4 h-4"></i> Add Shoe</h3>
+                                        <div className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem]">
+                                            <h3 className="font-black uppercase mb-6 italic text-red-500">Add New Shoe</h3>
                                             <div className="space-y-4">
-                                                <input placeholder="Name" value={newProduct.name} onChange={e=>setNewProduct({...newProduct, name: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none focus:border-red-500 text-white" />
-                                                <input placeholder="Price ₹" type="number" value={newProduct.price} onChange={e=>setNewProduct({...newProduct, price: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none text-white" />
-                                                <select value={newProduct.category} onChange={e=>setNewProduct({...newProduct, category: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none text-white/50 uppercase font-black">
+                                                <input placeholder="Shoe Name" value={newProduct.name} onChange={e=>setNewProduct({...newProduct, name: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm" />
+                                                <input placeholder="Price (₹)" type="number" value={newProduct.price} onChange={e=>setNewProduct({...newProduct, price: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm" />
+                                                <select value={newProduct.category} onChange={e=>setNewProduct({...newProduct, category: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm text-white/50">
                                                     <option value="Sneakers">Sneakers</option>
                                                     <option value="Slippers">Slippers</option>
                                                     <option value="Formal">Formal</option>
                                                 </select>
-                                                <input placeholder="Image URL (optional)" value={newProduct.image} onChange={e=>setNewProduct({...newProduct, image: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm outline-none text-white" />
-                                                <button onClick={() => { setProducts([...products, {...newProduct, id: Date.now()}]); setNewProduct({name:'', price:'', image:'', category:'Sneakers'}); }} className="w-full bg-red-600 p-4 rounded-xl font-black uppercase text-xs shadow-lg shadow-red-600/20">Save to Store</button>
+                                                <input placeholder="Image URL" value={newProduct.image} onChange={e=>setNewProduct({...newProduct, image: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-sm" />
+                                                <button onClick={addProduct} className="w-full bg-red-600 p-4 rounded-xl font-black uppercase text-xs">Save to Mart</button>
                                             </div>
                                         </div>
-                                        
-                                        <div className="lg:col-span-2 space-y-4">
-                                            <h3 className="font-black uppercase mb-6 italic text-white/40">Inventory ({products.length})</h3>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                {products.map(p => (
-                                                    <div key={p.id} className="p-4 bg-white/5 border border-white/10 rounded-2xl flex justify-between items-center hover:bg-white/10 transition-all">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-12 h-12 bg-black rounded-xl p-1 overflow-hidden border border-white/5 flex items-center justify-center shrink-0">
-                                                                {p.image ? <img src={p.image} className="w-full h-full object-contain"/> : <i data-lucide="package" className="w-5 h-5 text-white/20"></i>}
-                                                            </div>
-                                                            <div>
-                                                                <p className="font-black text-sm uppercase italic text-white truncate w-32">{p.name}</p>
-                                                                <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">₹{p.price} • {p.category}</p>
-                                                            </div>
-                                                        </div>
-                                                        <button onClick={() => setProducts(products.filter(x=>x.id!==p.id))} className="text-white/20 hover:text-red-500 p-2 transition-all"><i data-lucide="trash-2" className="w-5 h-5"></i></button>
+                                        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {products.map(p => (
+                                                <div key={p.id} className="p-4 bg-white/5 border border-white/10 rounded-2xl flex justify-between items-center">
+                                                    <div className="flex gap-4 items-center">
+                                                        <div className="w-10 h-10 bg-black rounded p-1 overflow-hidden">{p.image && <img src={p.image} className="w-full h-full object-contain"/>}</div>
+                                                        <div><p className="font-black text-xs uppercase italic">{p.name}</p><p className="text-[10px] text-white/20 font-bold uppercase">₹{p.price}</p></div>
                                                     </div>
-                                                ))}
-                                            </div>
+                                                    <button onClick={()=>deleteProduct(p.id)} className="text-white/20 hover:text-red-500"><i data-lucide="trash-2" className="w-4 h-4"></i></button>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
-
-                                    <div className="bg-white/5 border border-white/10 p-8 rounded-[3rem] shadow-2xl">
+                                    <div className="bg-white/5 border border-white/10 p-8 rounded-[3rem]">
                                         <h3 className="font-black uppercase mb-8 italic text-2xl text-red-500">Customer Bookings</h3>
                                         <div className="space-y-6">
-                                            {orders.length === 0 ? <p className="text-center text-white/10 uppercase font-black py-20 tracking-[0.5em]">No orders received yet</p> : 
+                                            {orders.length === 0 ? <p className="text-center text-white/10 py-10 uppercase font-black">No Orders Yet</p> : 
                                                 orders.map(o => (
-                                                    <div key={o.id} className="bg-black/60 border border-white/5 p-8 rounded-[2rem] grid grid-cols-1 md:grid-cols-3 gap-8 hover:border-red-500/30 transition-all">
+                                                    <div key={o.id} className="bg-black/40 border border-white/5 p-6 rounded-[2rem] grid grid-cols-1 md:grid-cols-3 gap-6 hover:border-red-500/30 transition-all">
                                                         <div className="md:border-r border-white/5 pr-4">
-                                                            <div className="inline-block px-3 py-1 bg-red-600/10 text-red-500 text-[10px] font-black uppercase rounded-full mb-4">Customer Details</div>
-                                                            <p className="text-2xl font-black uppercase italic mb-1 text-white">{o.name}</p>
-                                                            <p className="text-red-500 font-black text-sm">📞 {o.phone}</p>
-                                                            <div className="text-white/40 text-xs mt-4 bg-white/5 p-4 rounded-2xl italic leading-relaxed border border-white/5">
-                                                                <p className="text-[8px] font-black text-white/20 uppercase mb-2">Address</p>
-                                                                📍 {o.address}
-                                                            </div>
+                                                            <p className="text-xl font-black uppercase italic mb-1">{o.name}</p>
+                                                            <p className="text-red-500 font-bold text-sm">📞 {o.phone}</p>
+                                                            <div className="text-white/20 text-xs mt-3 bg-black p-4 rounded-xl border border-white/5 italic leading-relaxed">📍 {o.address}</div>
                                                         </div>
                                                         <div className="md:col-span-2 flex flex-col justify-between">
                                                             <div>
-                                                                <p className="text-[10px] font-black text-white/20 uppercase mb-4 tracking-widest">Order List</p>
-                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                                <p className="text-[10px] font-black text-white/20 uppercase mb-3 tracking-widest">Order Details</p>
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                                     {o.items.map((it, idx) => (
-                                                                        <div key={idx} className="bg-white/5 p-3 px-5 rounded-2xl flex justify-between items-center border border-white/5">
-                                                                            <span className="text-xs font-black uppercase italic text-white/80">{it.name} <span className="text-red-500 ml-2">x{it.qty}</span></span>
-                                                                            <span className="text-sm font-black text-white">₹{it.price*it.qty}</span>
+                                                                        <div key={idx} className="bg-white/5 p-2 px-4 rounded-lg flex justify-between text-[10px] font-bold uppercase italic border border-white/5">
+                                                                            <span>{it.name} x{it.qty}</span>
+                                                                            <span className="text-white/40">₹{it.price*it.qty}</span>
                                                                         </div>
                                                                     ))}
                                                                 </div>
                                                             </div>
-                                                            <div className="mt-8 flex flex-col md:flex-row justify-between items-center border-t border-white/5 pt-6 gap-4">
-                                                                <p className="text-[9px] font-black text-white/20 uppercase tracking-widest order-2 md:order-1">{o.time}</p>
-                                                                <div className="flex items-center gap-6 order-1 md:order-2">
-                                                                    <div className="text-right">
-                                                                        <p className="text-[8px] font-black text-white/20 uppercase">Total Received</p>
-                                                                        <p className="text-3xl font-black text-red-500 italic leading-none">₹{o.total}</p>
-                                                                    </div>
-                                                                    <button onClick={() => setOrders(orders.filter(x=>x.id!==o.id))} className="bg-white/5 p-3 rounded-xl text-white/20 hover:text-red-500 hover:bg-red-500/10 transition-all border border-white/5"><i data-lucide="trash-2" className="w-5 h-5"></i></button>
+                                                            <div className="mt-6 flex justify-between items-center border-t border-white/5 pt-4">
+                                                                <p className="text-[9px] font-black text-white/20 uppercase tracking-widest">{o.time}</p>
+                                                                <div className="flex items-center gap-6">
+                                                                    <p className="text-2xl font-black text-red-500 italic">₹{o.total}</p>
+                                                                    <button onClick={()=>deleteOrder(o.id)} className="text-white/10 hover:text-red-500"><i data-lucide="trash-2" className="w-5 h-5"></i></button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -268,105 +211,73 @@
                         )}
                     </main>
 
-                    {/* Cart Drawer Modal */}
-                    {isCartOpen && <CartDrawer cart={cart} onClose={() => setIsCartOpen(false)} onRemove={id => setCart(cart.filter(x=>x.id!==id))} onCheckout={handleFinalBooking} />}
-
-                    <footer className="py-16 text-center border-t border-white/5 opacity-30 mt-auto">
-                        <p className="text-[9px] font-black uppercase tracking-[0.8em]">Pawan Kalyan Shoe Mart • Authentic Collection</p>
-                    </footer>
+                    {isCartOpen && (
+                        <div className="fixed inset-0 z-[200] flex justify-end">
+                            <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={() => setIsCartOpen(false)}></div>
+                            <CartModal cart={cart} onRemove={id => setCart(cart.filter(x=>x.id!==id))} onCheckout={handleCheckout} onClose={() => setIsCartOpen(false)} />
+                        </div>
+                    )}
                 </div>
             );
         };
 
-        const CartDrawer = ({ cart, onClose, onRemove, onCheckout }) => {
+        const CartModal = ({ cart, onRemove, onCheckout, onClose }) => {
             const [step, setStep] = useState(1);
             const [form, setForm] = useState({ name: '', phone: '', address: '' });
-            const [success, setSuccess] = useState(false);
+            const [done, setDone] = useState(false);
             const total = cart.reduce((s,i)=>s+(i.price*i.qty),0);
 
-            const handleOrderSubmit = () => {
-                if(!form.name || !form.phone || !form.address) return alert("Please fill all details");
-                onCheckout(form);
-                setSuccess(true);
-                setTimeout(() => onClose(), 3500);
-            };
+            if (done) return (
+                <div className="relative bg-black w-full md:max-w-md h-full flex flex-col items-center justify-center p-10 text-center border-l border-white/10">
+                    <i data-lucide="check-circle-2" className="w-20 h-20 text-green-500 mb-6 animate-bounce"></i>
+                    <h3 className="text-2xl font-black uppercase italic mb-2">Order Confirmed</h3>
+                    <p className="text-white/40 uppercase text-[10px]">Thank you for choosing PK MART</p>
+                </div>
+            );
 
             return (
-                <div className="fixed inset-0 z-[200] flex justify-end">
-                    <div className="absolute inset-0 bg-black/95 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
-                    <div className="relative bg-[#0a0a0a] border-l border-white/10 w-full md:max-w-md h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-500">
-                        <div className="p-8 border-b border-white/5 flex justify-between items-center bg-black/40 backdrop-blur-md">
-                            <h3 className="text-3xl font-black uppercase italic tracking-tighter text-white">{step === 1 ? 'My Bag' : 'Booking Info'}</h3>
-                            <button onClick={onClose} className="p-2 text-white/40 hover:text-white transition-colors"><i data-lucide="x"></i></button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-8 space-y-4 no-scrollbar">
-                            {!success ? (
-                                step === 1 ? (
-                                    cart.length === 0 ? (
-                                        <div className="text-center py-20 opacity-20">
-                                            <i data-lucide="shopping-bag" className="w-16 h-16 mx-auto mb-4"></i>
-                                            <p className="font-black uppercase italic text-sm">Bag is empty</p>
-                                        </div>
-                                    ) : cart.map(i => (
-                                        <div key={i.id} className="bg-white/5 p-4 rounded-[2rem] flex gap-5 items-center border border-white/5 hover:bg-white/10 transition-all">
-                                            <div className="w-20 h-20 bg-black rounded-2xl flex items-center justify-center p-2 border border-white/5 shrink-0">
-                                                {i.image ? <img src={i.image} className="w-full h-full object-contain drop-shadow-xl"/> : <ProductIcon category={i.category}/>}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="font-black uppercase italic text-sm text-white truncate">{i.name}</p>
-                                                <p className="text-[10px] text-white/40 font-bold uppercase mt-1">₹{i.price} <span className="text-red-500 ml-2">Qty: {i.qty}</span></p>
-                                            </div>
-                                            <button onClick={()=>onRemove(i.id)} className="text-white/20 hover:text-red-500 p-2"><i data-lucide="trash-2" className="w-4 h-4"></i></button>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="space-y-5 animate-in fade-in duration-500">
-                                        <div className="bg-red-600/5 p-6 rounded-[2rem] border border-red-600/20 mb-8">
-                                            <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-2">Booking Summary</p>
-                                            <p className="text-white font-bold text-sm">Total Amount: <span className="text-xl font-black ml-2 text-white">₹{total}</span></p>
-                                        </div>
-                                        <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-white/40 uppercase ml-2">Your Full Name</label>
-                                            <input value={form.name} onChange={e=>setForm({...form, name: e.target.value})} placeholder="e.g. Rahul Sharma" className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none focus:border-red-500 transition-all text-sm" />
-                                            <label className="text-[10px] font-black text-white/40 uppercase ml-2">Phone Number</label>
-                                            <input type="tel" value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} placeholder="Mobile Number" className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none focus:border-red-500 transition-all text-sm" />
-                                            <label className="text-[10px] font-black text-white/40 uppercase ml-2">Delivery Address</label>
-                                            <textarea value={form.address} onChange={e=>setForm({...form, address: e.target.value})} placeholder="Full address with landmark" rows="4" className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none focus:border-red-500 transition-all text-sm"></textarea>
-                                        </div>
+                <div className="relative bg-[#080808] border-l border-white/10 w-full md:max-w-md h-full flex flex-col shadow-2xl">
+                    <div className="p-8 border-b border-white/5 flex justify-between items-center bg-black/40">
+                        <h3 className="text-3xl font-black uppercase italic tracking-tighter">{step === 1 ? 'My Bag' : 'Shipping'}</h3>
+                        <button onClick={onClose} className="p-2 text-white/20"><i data-lucide="x"></i></button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-8 space-y-4 no-scrollbar">
+                        {step === 1 ? (
+                            cart.length === 0 ? <p className="text-center py-20 text-white/10 font-black italic">Bag is Empty</p> :
+                            cart.map(i => (
+                                <div key={i.id} className="bg-white/5 p-4 rounded-2xl flex gap-4 items-center border border-white/5">
+                                    <div className="flex-1">
+                                        <p className="font-black uppercase italic text-sm truncate">{i.name}</p>
+                                        <p className="text-[10px] text-white/30 font-bold uppercase">₹{i.price} x {i.qty}</p>
                                     </div>
-                                )
-                            ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-center animate-in zoom-in duration-500">
-                                    <div className="w-24 h-24 bg-green-500/10 rounded-full flex items-center justify-center mb-8 border border-green-500/20 shadow-2xl shadow-green-500/10">
-                                        <i data-lucide="check-circle-2" className="w-12 h-12 text-green-500 animate-bounce"></i>
-                                    </div>
-                                    <h4 className="text-4xl font-black uppercase italic text-white tracking-tighter mb-4 leading-none">ORDER<br/>SUCCESSFUL</h4>
-                                    <p className="text-white/40 uppercase text-[10px] tracking-[0.4em] font-black">We will contact you shortly</p>
+                                    <button onClick={()=>onRemove(i.id)} className="text-white/20 hover:text-red-500"><i data-lucide="trash-2" className="w-4 h-4"></i></button>
                                 </div>
-                            )}
-                        </div>
-                        {cart.length > 0 && !success && (
-                            <div className="p-8 bg-black/60 border-t border-white/5 backdrop-blur-3xl shadow-2xl">
-                                <div className="flex justify-between items-center mb-8 uppercase italic font-black">
-                                    <span className="text-white/20 text-[10px] tracking-widest">Payable Amount</span>
-                                    <span className="text-3xl text-red-500 leading-none">₹{total}</span>
-                                </div>
-                                {step === 1 ? (
-                                    <button onClick={()=>setStep(2)} className="w-full bg-white text-black p-5 rounded-[1.5rem] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-xl shadow-white/5">Confirm Items</button>
-                                ) : (
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <button onClick={()=>setStep(1)} className="bg-white/5 border border-white/10 p-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest text-white/60 hover:bg-white/10">Back</button>
-                                        <button onClick={handleOrderSubmit} className="bg-red-600 p-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest text-white shadow-xl shadow-red-600/20 active:scale-95 transition-all">Book Now</button>
-                                    </div>
-                                )}
+                            ))
+                        ) : (
+                            <div className="space-y-4">
+                                <input placeholder="Full Name" value={form.name} onChange={e=>setForm({...form, name: e.target.value})} className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none focus:border-red-500" />
+                                <input placeholder="Phone" value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none focus:border-red-500" />
+                                <textarea placeholder="Home Address" value={form.address} onChange={e=>setForm({...form, address: e.target.value})} rows="4" className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none focus:border-red-500"></textarea>
                             </div>
                         )}
                     </div>
+                    {cart.length > 0 && (
+                        <div className="p-8 bg-black border-t border-white/5">
+                            <div className="flex justify-between items-center mb-8 uppercase italic font-black">
+                                <span className="text-white/20 text-xs tracking-widest">Payable</span>
+                                <span className="text-3xl text-red-500">₹{total}</span>
+                            </div>
+                            {step === 1 ? (
+                                <button onClick={()=>setStep(2)} className="w-full bg-white text-black p-5 rounded-2xl font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all">Proceed</button>
+                            ) : (
+                                <button onClick={() => { onCheckout(form); setDone(true); }} className="w-full bg-red-600 text-white p-5 rounded-2xl font-black uppercase shadow-xl shadow-red-600/20 active:scale-95 transition-all">Book Now</button>
+                            )}
+                        </div>
+                    )}
                 </div>
             );
         };
 
-        // Render the App
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
